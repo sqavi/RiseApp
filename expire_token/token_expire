@@ -1,0 +1,42 @@
+import boto3
+from datetime import datetime
+
+dynamodb = boto3.client('dynamodb')
+
+def lambda_handler(event, context):
+    try:
+        # Scan the second DynamoDB table to get all items
+        response = dynamodb.scan(
+            TableName='YourSecondDynamoDBTableName'  # Replace with your second DynamoDB table name
+        )
+
+        # Get the current time in UTC
+        current_time = datetime.utcnow().isoformat()
+
+        # Loop through each item in the table
+        for item in response.get('Items', []):
+            # Get the token expiry time from the item
+            token_expiry = item.get('token_expiry', {}).get('S')
+            if not token_expiry:
+                continue
+
+            # Compare the token expiry time with the current time
+            if token_expiry < current_time:
+                # If the token has expired, update the token_status attribute as "expired"
+                user_mobile = item.get('user_mobile', {}).get('S')
+                dynamodb.update_item(
+                    TableName='YourSecondDynamoDBTableName',  # Replace with your second DynamoDB table name
+                    Key={'user_mobile': {'S': user_mobile}},
+                    UpdateExpression='SET token_status = :status',
+                    ExpressionAttributeValues={':status': {'S': 'expired'}}
+                )
+
+        return {
+            'statusCode': 200,
+            'body': 'Token expiry check completed successfully'
+        }
+    except Exception as e:
+        return {
+            'statusCode': 500,
+            'body': str(e)
+        }
