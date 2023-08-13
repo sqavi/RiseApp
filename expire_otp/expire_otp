@@ -1,0 +1,40 @@
+import boto3
+import json
+import time
+from datetime import datetime, timedelta
+
+dynamodb = boto3.resource('dynamodb')
+table_name = 'RiseApp_registration'
+table = dynamodb.Table(table_name)
+
+def is_entry_old(entry_timestamp):
+    # Check if the current time is more than 15 minutes after the provided entry_timestamp
+    current_time = int(time.time())
+    fifteen_minutes_ago = current_time - (15 * 60)  # Convert 15 minutes to seconds
+    return entry_timestamp < fifteen_minutes_ago
+
+def lambda_handler(event, context):
+    try:
+        # Scan the entire DynamoDB table
+        response = table.scan()
+        items = response.get('Items', [])
+        
+        for item in items:
+            req_time = item.get('req_time')
+            user_mobile = item.get('user_mobile')
+            
+            # Check if the req_time is more than 15 minutes old
+            if req_time is not None and is_entry_old(req_time):
+                # Entry is older than 15 minutes, remove the entry from DynamoDB
+                table.delete_item(Key={'user_mobile': user_mobile})
+        
+        return {
+            'statusCode': 200,
+            'body': json.dumps({'status': 'Entry cleanup completed'}),
+        }
+    except Exception as e:
+        # Handle any exceptions and return error
+        return {
+            'statusCode': 500,
+            'body': json.dumps({'error': str(e)})
+        }

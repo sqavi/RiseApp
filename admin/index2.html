@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>RiseApp Admin</title>
+</head>
+<body>
+    <h1>Welcome, Admin!</h1>
+    <p>Authentication successful. Please choose a function:</p>
+    
+    <button id="listUsers">List All Users</button>
+    <button id="addUser">Add a New User</button>
+    <button id="deleteUser">Delete a User</button>
+    
+    <script>
+        // Function to handle listing all users
+        function listUsers() {
+            // Replace this with the actual URL for your API endpoint
+            const apiUrl = 'https://zkel9v1575.execute-api.ap-southeast-1.amazonaws.com/prod/admin;
+            
+            // Set up the API request parameters
+            const params = new URLSearchParams({
+                action: 'list_users',
+                code: authToken,
+            });
+            
+            // Make the API request
+            fetch(apiUrl + '?' + params.toString())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Replace this with the actual handling of the user list
+                console.log('User list:', data);
+                alert('User list: ' + JSON.stringify(data));
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+                alert('Error: ' + error.message);
+            });
+        }
+        
+        // Attach click event handler to the "List All Users" button
+        document.getElementById('listUsers').addEventListener('click', function() {
+            // Retrieve the authentication token from local storage
+            const authToken = localStorage.getItem('authToken');
+            if (!authToken) {
+                alert('Authentication token not found.');
+                return;
+            }
+            
+            // Call the listUsers function with the token
+            listUsers(authToken);
+        });
+
+        }
+        
+        // Function to handle adding a new user
+        function addUser() {
+            // Replace this with the actual implementation to add a new user
+            alert("Adding a new user. Replace this with the actual implementation.");
+        }
+        
+        // Function to handle deleting a user
+        function deleteUser() {
+            // Replace this with the actual implementation to delete a user
+            alert("Deleting a user. Replace this with the actual implementation.");
+        }
+        
+        // Attach click event handlers to the buttons
+        document.getElementById('listUsers').addEventListener('click', listUsers);
+        document.getElementById('addUser').addEventListener('click', addUser);
+        document.getElementById('deleteUser').addEventListener('click', deleteUser);
+    </script>
+
+    
+    
+</body>
+</html>

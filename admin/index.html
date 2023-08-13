@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Authentication Redirect</title>
+</head>
+<body>
+    <p>Redirecting to authentication...</p>
+    <script>
+        // Replace these URLs with the actual authentication and redirect URLs
+        const authenticationURL = 'https://riseapp.auth.us-east-1.amazoncognito.com/login?client_id=56spnjvu4oth203lo6jv3073fq&response_type=code&scope=aws.cognito.signin.user.admin+openid&redirect_uri=https%3A%2F%2Friseask.s3.ap-southeast-1.amazonaws.com%2Findex2.html';
+        const redirectURL = 'https://riseask.s3.ap-southeast-1.amazonaws.com/index2.html';
+        
+        // Function to save the authentication token to local storage
+        function saveAuthToken(token) {
+            localStorage.setItem('authToken', token);
+        }
+        
+        // Function to handle the redirection and token saving
+        function redirectToAuthentication() {
+            // Perform the redirection
+            window.location.href = authenticationURL;
+        }
+        
+        // Call the redirection function
+        redirectToAuthentication();
+        
+        // Once the authentication is successful and redirects back to the success URL,
+        // you can retrieve the token from the query parameters (server-side implementation required)
+        // and save it to local storage using the `saveAuthToken` function.
+    </script>
+</body>
+</html>

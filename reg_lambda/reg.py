@@ -21,6 +21,7 @@ def lambda_handler(event, context):
         device_os = event['device_os']
         device_type = event['device_type']
         user_name = event['user_name']
+        #device_ip = event['ip']
 
         data = {
             'user_mobile': user_mobile,
@@ -32,16 +33,17 @@ def lambda_handler(event, context):
         otp = generate_otp()
 
         # Get the current timestamp
-        request_time = int(time.time()) 
+        req_time = int(time.time()) 
 
         # Create item to save in DynamoDB
         item = {
             'user_mobile': {'S': user_mobile},
-            'device_os': {'S': data.get('device_os', '')},
-            'device_type': {'S': data.get('device_type', '')},
-            'device_ip': {'S': data.get('device_ip', '')},
+            'user_name': {'S': user_name},
+            'device_os': {'S': device_os},
+            'device_type': {'S': device_type},
+            #'device_ip': {'S': device_ip},
             'otp': {'S': otp},
-            'request_time': {'N': str(request_time)}
+            'req_time': {'N': str(req_time)}
         }
 
         # Save data to DynamoDB

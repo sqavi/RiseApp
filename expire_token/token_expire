@@ -1,42 +1,48 @@
 import boto3
-from datetime import datetime
+import json
+from datetime import datetime, timedelta
 
-dynamodb = boto3.client('dynamodb')
+dynamodb = boto3.resource('dynamodb')
+table_name = 'authentication_table'
+table = dynamodb.Table(table_name)
+
+def is_token_expired(expiry_date):
+    # Check if the current datetime is after the provided expiry date
+    #current_time = datetime.utcnow()
+    current_time = (datetime.utcnow() + timedelta(days=0)).isoformat()
+    
+    #return current_time > datetime.strptime(expiry_date, '%Y-%m-%dT%H:%M:%S.%fZ')
+    return current_time > expiry_date
 
 def lambda_handler(event, context):
     try:
-        # Scan the second DynamoDB table to get all items
-        response = dynamodb.scan(
-            TableName='YourSecondDynamoDBTableName'  # Replace with your second DynamoDB table name
-        )
-
-        # Get the current time in UTC
-        current_time = datetime.utcnow().isoformat()
-
-        # Loop through each item in the table
-        for item in response.get('Items', []):
-            # Get the token expiry time from the item
-            token_expiry = item.get('token_expiry', {}).get('S')
-            if not token_expiry:
-                continue
-
-            # Compare the token expiry time with the current time
-            if token_expiry < current_time:
-                # If the token has expired, update the token_status attribute as "expired"
-                user_mobile = item.get('user_mobile', {}).get('S')
-                dynamodb.update_item(
-                    TableName='YourSecondDynamoDBTableName',  # Replace with your second DynamoDB table name
-                    Key={'user_mobile': {'S': user_mobile}},
-                    UpdateExpression='SET token_status = :status',
-                    ExpressionAttributeValues={':status': {'S': 'expired'}}
-                )
-
+        # Scan all items in the DynamoDB table
+        response = table.scan()
+        items = response.get('Items', [])
+        
+        for item in items:
+            token_status = item.get('token_status')
+            token_expiry = item.get('token_expiry')
+            user_mobile = item.get('user_mobile')
+            
+            # Check if the token status is valid
+            if token_status == 'valid':
+                # Check if the token has expired
+                if is_token_expired(token_expiry):
+                    # Token has expired, update token_status to "expired"
+                    table.update_item(
+                        Key={'user_mobile': user_mobile},
+                        UpdateExpression="set token_status = :expired",
+                        ExpressionAttributeValues={':expired': 'expired'}
+                    )
+        
         return {
             'statusCode': 200,
-            'body': 'Token expiry check completed successfully'
+            'body': json.dumps({'status': 'Token expiry check completed'}),
         }
     except Exception as e:
+        # Handle any exceptions and return error
         return {
             'statusCode': 500,
-            'body': str(e)
+            'body': json.dumps({'error': str(e)})
         }

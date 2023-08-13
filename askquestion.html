@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ask a Question</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Ask a Question</h1>
+    <input type="text" id="questionInput" placeholder="Type your question here">
+    <button onclick="askQuestion()">Ask</button>
+
+    <script>
+        // Function to generate a random client ID
+        function generateClientId() {
+            return Math.random().toString(36).substr(2, 10); // Adjust length as needed
+        }
+
+        // Function to ask a question and store the client ID
+        function askQuestion() {
+            const question = $('#questionInput').val();
+            const clientId = generateClientId();
+
+            // Save the client ID in a variable or localStorage for future use
+            // For this example, we'll just log it to the console
+            console.log('Client ID:', clientId);
+
+            // Send the question and client ID to the backend (askquestion_lambda) using AJAX
+            $.ajax({
+                method: 'POST',
+                url: 'https://zkel9v1575.execute-api.ap-southeast-1.amazonaws.com/prod/reg', // Replace with the actual API endpoint
+                data: JSON.stringify({ question, clientId }),
+                contentType: 'application/json',
+                success: function (response) {
+                    console.log('Question sent successfully.');
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error sending question:', error);
+                }
+            });
+        }
+
+        // Function to pull messages from SNS based on the client ID
+        function pullMessages(clientId) {
+            // Poll the backend (API endpoint) to check for new messages and pass the client ID as a parameter
+            $.ajax({
+                method: 'GET',
+                url: 'https://zkel9v1575.execute-api.ap-southeast-1.amazonaws.com/prod/reg?clientId=' + clientId, // Replace with the actual API endpoint
+                success: function (response) {
+                    // Process the response and display the message (answer) to the user
+                    // For this example, we'll just log it to the console
+                    console.log('Received Message:', response);
+
+                    // Call the pullMessages() function again after a certain interval (e.g., 5 seconds)
+                    setTimeout(function () {
+                        pullMessages(clientId);
+                    }, 5000); // Adjust the interval as needed
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error pulling messages:', error);
+                }
+            });
+        }
+
+        // After asking a question, call the pullMessages() function to start pulling messages for the client
+        function askQuestion() {
+            const question = $('#questionInput').val();
+            const clientId = generateClientId();
+
+            // Save the client ID in a variable or localStorage for future use
+            // For this example, we'll just log it to the console
+            console.log('Client ID:', clientId);
+
+            // Send the question and client ID to the backend (askquestion_lambda) using AJAX
+            $.ajax({
+                method: 'POST',
+                url: 'YOUR_API_ENDPOINT', // Replace with the actual API endpoint
+                data: JSON.stringify({ question, clientId }),
+                contentType: 'application/json',
+                success: function (response) {
+                    console.log('Question sent successfully.');
+
+                    // After sending the question, start pulling messages for the client
+                    pullMessages(clientId);
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error sending question:', error);
+                }
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Frontend App</title>
+</head>
+<body>
+  <h1>Frontend App</h1>
+  <label for="api-key">API Key:</label>
+  <input type="text" id="api-key" placeholder="Enter your API Key">
+  <br>
+  <br>
+  <label for="user_mobile">User Mobile:</label>
+  <input type="text" id="user_mobile" placeholder="Enter user mobile number">
+  <br>
+  <br>
+  <label for="user_name">User Name:</label>
+  <input type="text" id="user_name" placeholder="Enter user name">
+  <br>
+  <br>
+  <label for="device_os">Device OS :</label>
+  <input type="text" id="device_os" placeholder="Enter your mobile OS ((e.g. android or ios))">
+  <br>
+  <br>
+  <label for="device_type">Device Model:</label>
+  <input type="text" id="device_type" placeholder="Enter Mobile Device Model">
+  <br>
+  <br>
+  <label for="user_name">User Name:</label>
+  <input type="text" id="user_name" placeholder="Enter your name">
+  <br>
+  <br>
+  <label for="device_os">Device OS:</label>
+  <input type="text" id="device_os" placeholder="Enter Device OS(e.g. Andoride or IOS)">
+  <br>
+  <br>
+  <label for="device_type">Device Model:</label>
+  <input type="text" id="device_type" placeholder="Enter your mobile model">
+  <br>
+  <!-- Add more input fields for other data you want to send to the API -->
+  <br>
+  <button onclick="registerUser()">Register User</button>
+  <button onclick="authenticateUser()">Authenticate User</button>
+  <button onclick="verifyOTP()">Verify OTP</button>
+  <button onclick="askGPT()">Ask GPT</button>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="frontend.js"></script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+import boto3
+import json
+
+ssm = boto3.client('ssm')
+
+def get_api_key():
+    try:
+        response = ssm.get_parameter(Name='myKey', WithDecryption=True)
+        return response['Parameter']['Value']
+    except Exception as e:
+        raise e
+
+def lambda_handler(event, context):
+    try:
+        # Retrieve the apikey from SSM Parameter Store
+        apikey = get_api_key()
+        
+        return {
+            'statusCode': 200,
+            'body': json.dumps({'apikey': apikey}),
+        }
+    except Exception as e:
+        return {
+            'statusCode': 500,
+            'body': json.dumps({'error': str(e)})
+        }

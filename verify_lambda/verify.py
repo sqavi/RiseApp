@@ -17,7 +17,7 @@ def lambda_handler(event, context):
         
         # Extract user_mobile and OTP from the request
         user_mobile = event['user_mobile']
-        entered_otp = event['otp]']
+        entered_otp = event['otp']
         if not user_mobile or not entered_otp:
             return {
                 'statusCode': 400,
@@ -26,7 +26,7 @@ def lambda_handler(event, context):
 
         # Verify OTP against DynamoDB
         response = dynamodb.get_item(
-            TableName='RiseApp_registration',  # Replace with your DynamoDB table name
+            TableName='RiseApp_registration', 
             Key={'user_mobile': {'S': user_mobile}}
         )
         dynamodb_otp = response.get('Item', {}).get('otp', {}).get('S')
@@ -38,7 +38,7 @@ def lambda_handler(event, context):
             }
 
         # Generate a 16-digit alphanumeric token
-        token = generate_token(16)
+        auth_token = generate_token(16)
 
         # Get user details from the first table
         user_details = response.get('Item', {})
@@ -52,27 +52,29 @@ def lambda_handler(event, context):
         # Get the current timestamp
         request_time = int(time.time()) 
         
+        #Set token Status valid 
+        token_status = "valid"
         # Create item to save in second DynamoDB table
         item = {
+            'auth_token': {'S': auth_token},
             'user_mobile': {'S': user_mobile},
             'user_name': {'S': user_name},
             'device_os': {'S': device_os},
             'device_type': {'S': device_type},
-            'token': {'S': token},
             'request_time': {'N': str(request_time)},
             'token_expiry': {'S': expiry_date},
-            'token_status' : "valid"
+            'token_status' : {'S': token_status}
         }
 
         # Save token-related data to second DynamoDB table
         dynamodb.put_item(
-            TableName='RiseApp_authentication',  
+            TableName='authentication_table',  
             Item=item
         )
 
         return {
             'statusCode': 200,
-            'body': json.dumps({'message': 'Token created successfully', 'token': token})
+            'body': json.dumps({'message': 'Token created successfully', 'auth_token': auth_token})
         }
     except ClientError as e:
         return {

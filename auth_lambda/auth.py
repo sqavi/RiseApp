@@ -1,48 +1,48 @@
-import json
 import boto3
+import json
 from datetime import datetime
 
-s3 = boto3.client('s3')
+dynamodb = boto3.resource('dynamodb')
+table_name = 'authentication_table'
+table = dynamodb.Table(table_name)
 
 def lambda_handler(event, context):
     try:
-        # Extract token from query string parameters
-        query_params = event.get('queryStringParameters')
-        token = query_params.get('token')
-        if not token:
+        # Parse input JSON
+     
+        auth_token = event['auth_token']
+        user_mobile = event['user_mobile']
+        
+        # Query DynamoDB for the item with the given mobile number
+        response = table.get_item(Key={'user_mobile': user_mobile})
+        item = response.get('Item')
+        
+        # Check if the item exists in DynamoDB
+        if item is not None:
+            stored_token = item.get('auth_token')
+            token_status = item.get('token_status')
+            
+            # Compare the stored token and validate it
+            if stored_token == auth_token and token_status == 'valid':
+                # Token is valid, return success
+                return {
+                    'statusCode': 200,
+                    'body': json.dumps({'status': 'success'})
+                }
+            else:
+                # Token is invalid or token_status is not valid, return error
+                return {
+                    'statusCode': 400,
+                    'body': json.dumps({'error': 'Invalid auth_token or token expired'})
+                }
+        else:
+            # Item not found in DynamoDB, return error
             return {
-                'statusCode': 400,
-                'body': json.dumps({'error': 'Token is required in query string'})
+                'statusCode': 404,
+                'body': json.dumps({'error': 'Mobile number not found'})
             }
-
-        # Check if the token exists as an S3 object
-        object_key = f'{token}.txt'
-        try:
-            s3.head_object(Bucket='your-bucket-name', Key=object_key)
-        except s3.exceptions.NoSuchKey:
-            return {
-                'statusCode': 401,
-                'body': json.dumps({'error': 'Token does not exist. Please register again.'})
-            }
-
-        # Retrieve the token's expiry date from the S3 object's metadata
-        response = s3.get_object(Bucket='your-bucket-name', Key=object_key)
-        expiry_date = response['Metadata'].get('expiry_date')
-
-        # Compare token's expiry date with the current date
-        current_time = datetime.utcnow().isoformat()
-        if expiry_date and current_time > expiry_date:
-            return {
-                'statusCode': 401,
-                'body': json.dumps({'error': 'Token has expired. Please register again.'})
-            }
-
-        # If token exists and is valid, return status code 200 to continue
-        return {
-            'statusCode': 200,
-            'body': json.dumps({'message': 'Token is valid. Continue.'})
-        }
     except Exception as e:
+        # Handle any exceptions and return error
         return {
             'statusCode': 500,
             'body': json.dumps({'error': str(e)})

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Registration</title>
+</head>
+<body>
+    <h1>User Registration</h1>
+    <form id="registrationForm">
+        <label for="name">Name:</label>
+        <input type="text" id="name" required>
+        <br>
+        <label for="mobile">Mobile Number:</label>
+        <input type="tel" id="mobile" required>
+        <br>
+        <button type="button" onclick="registerUser">Register</button>
+    </form>
+
+    <script>
+        function getDeviceInformation() {
+            const userAgent = navigator.userAgent;
+            const isMobile = /Mobile|Tablet|iPad|iPhone|Android/.test(userAgent);
+            const deviceType = isMobile ? 'Mobile Device' : 'Desktop or Laptop';
+            const operatingSystem = isMobile ? 'Mobile OS' : 'Desktop OS';
+
+            return {
+                deviceType: deviceType,
+                operatingSystem: operatingSystem
+            };
+        }
+
+        document.getElementsByTagName("button")[0].addEventListener("click", function(){
+
+            registerUser();
+        })
+
+        function registerUser() {
+            console.log("button clicked");
+            const name = document.getElementById('name').value;
+            const mobile = document.getElementById('mobile').value;
+            const deviceInfo = getDeviceInformation();
+
+            const registrationData = {
+                user_name: name,
+                user_mobile: mobile,
+                device_os: deviceInfo.operatingSystem,
+                device_type: deviceInfo.deviceType
+            };
+
+            // Send registrationData to the API endpoint using AJAX
+            const apiUrl = 'https://zkel9v1575.execute-api.ap-southeast-1.amazonaws.com/prod/reg' // Replace with the actual API endpoint
+            fetch(apiUrl, {
+                method: 'POST',
+                mode: 'no-cors', // Set the mode to 'no-cors'
+                headers: {
+                    'Content-Type': 'application/json',
+                    'apikey': 'vrWrkSAogJ2vvdgkLjrVv632BUGswRTf8cqAuZgx',
+                },
+                body: JSON.stringify(registrationData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Registration successful:', data);
+            })
+            .catch(error => {
+                console.error('Error registering user:', error);
+            });
+        }
+    </script>
+</body>
+</html>
