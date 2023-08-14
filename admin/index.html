@@ -7,7 +7,7 @@
     <p>Redirecting to authentication...</p>
     <script>
         // Replace these URLs with the actual authentication and redirect URLs
-        const authenticationURL = 'https://riseapp.auth.us-east-1.amazoncognito.com/login?client_id=56spnjvu4oth203lo6jv3073fq&response_type=code&scope=aws.cognito.signin.user.admin+openid&redirect_uri=https%3A%2F%2Friseask.s3.ap-southeast-1.amazonaws.com%2Findex2.html';
+        const authenticationURL = 'https://riseapp.auth.us-east-1.amazoncognito.com/oauth2/authorize?client_id=4g0rt77p38tmi2ckqo1amc0cq3&response_type=token&scope=email+https%3A%2F%2F73qn0eq2cd.execute-api.ap-southeast-1.amazonaws.com%2Fprod%2Fadmin+openid+phone&redirect_uri=https%3A%2F%2Friseask.s3.ap-southeast-1.amazonaws.com%2Findex2.html';
         const redirectURL = 'https://riseask.s3.ap-southeast-1.amazonaws.com/index2.html';
         
         // Function to save the authentication token to local storage

@@ -13,9 +13,9 @@
     
     <script>
         // Function to handle listing all users
-        function listUsers() {
+        function listUsers(authToken) {
             // Replace this with the actual URL for your API endpoint
-            const apiUrl = 'https://zkel9v1575.execute-api.ap-southeast-1.amazonaws.com/prod/admin;
+            const apiUrl = 'https://zkel9v1575.execute-api.ap-southeast-1.amazonaws.com/prod/admin';
             
             // Set up the API request parameters
             const params = new URLSearchParams({
@@ -42,20 +42,36 @@
             });
         }
         
-        // Attach click event handler to the "List All Users" button
-        document.getElementById('listUsers').addEventListener('click', function() {
-            // Retrieve the authentication token from local storage
-            const authToken = localStorage.getItem('authToken');
-            if (!authToken) {
-                alert('Authentication token not found.');
-                return;
-            }
-            
-            // Call the listUsers function with the token
-            listUsers(authToken);
-        });
+    function captureAndStoreTokens() {
+    const hashParams = new URLSearchParams(window.location.hash.slice(1));
+    const idToken = hashParams.get('id_token');
+    const accessToken = hashParams.get('access_token');
+    const tokenExpiry = hashParams.get('expires_in');
+    const tokenType = hashParams.get('token_type');
 
-        }
+    // Check if the tokens are present
+    //if (idToken && accessToken && tokenExpiry && tokenType) {
+    if (idToken) {
+
+        // Store the tokens in local storage or perform other actions
+        localStorage.setItem('id_token', idToken);
+        localStorage.setItem('access_token', accessToken);
+        localStorage.setItem('expires_in', tokenExpiry);
+        localStorage.setItem('token_type', tokenType);
+
+        // Output the tokens for testing (remove this in production)
+        console.log('id_token:', idToken);
+        console.log('access_token:', accessToken);
+        console.log('expires_in:', tokenExpiry);
+        console.log('token_type:', tokenType);
+    } else {
+        // Tokens are missing
+        console.error('Tokens are missing from the URL fragment.');
+        alert('Tokens are missing. Authentication failed.');
+    }
+}
+
+
         
         // Function to handle adding a new user
         function addUser() {
@@ -70,12 +86,11 @@
         }
         
         // Attach click event handlers to the buttons
-        document.getElementById('listUsers').addEventListener('click', listUsers);
         document.getElementById('addUser').addEventListener('click', addUser);
         document.getElementById('deleteUser').addEventListener('click', deleteUser);
-    </script>
+        // Call the function to capture and store the tokens
+captureAndStoreTokens();
 
-    
-    
+    </script>
 </body>
 </html>
