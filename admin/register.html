@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Registration</title>
+</head>
+<body>
+    <h1>User Registration</h1>
+    
+    <form id="registrationForm">
+        <label for="user_name">User Name:</label>
+        <input type="text" id="user_name" name="user_name" required><br><br>
+        
+        <label for="user_mobile">User Mobile:</label>
+        <input type="text" id="user_mobile" name="user_mobile" required><br><br>
+        
+        <button type="submit">Register</button>
+    </form>
+    
+    <script>
+        const registrationForm = document.getElementById('registrationForm');
+        
+        registrationForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            const user_name = document.getElementById('user_name').value;
+            const user_mobile = document.getElementById('user_mobile').value;
+            
+            // Fetch device information (replace with actual implementation)
+            const device_type = getDeviceType();
+            const device_os = getDeviceOS();
+            
+            // Save user_name and user_mobile in local storage
+            localStorage.setItem('user_name', user_name);
+            localStorage.setItem('user_mobile', user_mobile);
+            
+            // Send registration request to your API endpoint
+            fetch('https://zkel9v1575.execute-api.ap-southeast-1.amazonaws.com/prod/reg', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_name: user_name,
+                    user_mobile: user_mobile,
+                    device_type: device_type,
+                    device_os: device_os,
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                const responseBody = JSON.parse(data.body); // Parse the JSON within the response body
+                const otp = responseBody.otp; // Get the OTP value from the parsed response body
+    
+                // Save OTP in local storage
+                localStorage.setItem('otp', otp);
+                
+                // Redirect to the OTP verification page
+                //window.location.href = `otp_verification.html?user_mobile=${user_mobile}&otp=${otp}`;
+                
+               window.location.href = 'verify.html';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Registration failed. Please try again.');
+            });
+        });
+        
+        // Replace these with actual implementations to get device type and OS
+        function getDeviceType() {
+            return 'PC'; // Replace with logic to determine device type
+        }
+        
+        function getDeviceOS() {
+            return 'Windows'; // Replace with logic to determine device OS
+        }
+    
+    </script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OTP Verification</title>
+</head>
+<body>
+    <h1>OTP Verification</h1>
+
+    <script>
+       // Get user_mobile and otp from local storage
+const user_mobile = localStorage.getItem('user_mobile');
+const otp = localStorage.getItem('otp');
+console.log('OTP:', otp, 'user_mobile:', user_mobile);
+// Prepare the request body
+const requestBody = {
+    user_mobile: user_mobile,
+    otp: otp
+};
+
+// Send verification request to API
+fetch('https://zkel9v1575.execute-api.ap-southeast-1.amazonaws.com/prod/verify', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(requestBody)
+})
+.then(response => response.json())
+.then(data => {
+    const responseBody = JSON.parse(data.body); // Parse the JSON within the response body
+    const auth_token = responseBody.auth_token; // Get the OTP value from the parsed response body
+    //const auth_token = data.auth_token; // Assuming auth_token is in the response JSON
+
+    // Save auth_token in local storage
+    localStorage.setItem('auth_token', auth_token);
+
+    // Redirect to the askgpt page
+    window.location.href = 'askgpt.html';
+})
+.catch(error => {
+    console.error('Verification Error:', error);
+    // Handle error here
+});
+</script>
+</body>
+</html>
