@@ -1,96 +1,552 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>RiseApp Admin</title>
-</head>
-<body>
-    <h1>Welcome, Admin!</h1>
-    <p>Authentication successful. Please choose a function:</p>
-    
-    <button id="listUsers">List All Users</button>
-    <button id="addUser">Add a New User</button>
-    <button id="deleteUser">Delete a User</button>
-    
-    <script>
-        // Function to handle listing all users
-        function listUsers(authToken) {
-            // Replace this with the actual URL for your API endpoint
-            const apiUrl = 'https://zkel9v1575.execute-api.ap-southeast-1.amazonaws.com/prod/admin';
-            
-            // Set up the API request parameters
-            const params = new URLSearchParams({
-                action: 'list_users',
-                code: authToken,
-            });
-            
-            // Make the API request
-            fetch(apiUrl + '?' + params.toString())
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
+    <head>
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+        <title>RiseApp Admin</title>
+        <style>
+            html{
+                background-color: #192f59;
+            }
+            body{
+                min-height: 100%;
+                max-width: 90%;
+
+                background-color: #192f59;
+                margin: auto;
+                padding: 0;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+
+                font-size: 1em;
+                font-family:Helvetica, sans-serif
+            }
+            header{
+                background-color: white;
+                display: flex;
+                padding: 5px;
+                min-width: 100%;
+            }
+            .riseLogo{
+                margin-left: 5px;
+                height: 70px;
+                width: 160px;
+
+                background-image:url("./Rise-Logo.png");
+                background-size:contain; /* Adjust image size to cover the button */
+                background-repeat: no-repeat;
+                background-position: center; /* Center the image */
+            }
+            .options{
+                margin: auto;
+            }
+            .options button{
+                font: inherit;
+                width: 200px;
+                height: 60px;
+
+                background-color: transparent;
+                    color: black;
+                    border: solid 4px #192f59;
+
+                animation: hover-back;
+                animation-duration: 0.5s;
+                animation-fill-mode: forwards;
+            }
+            .options button:hover{
+                animation: hover;
+                animation-duration: 0.5s;
+                animation-fill-mode: forwards;
+            }
+
+            @keyframes hover{
+                0% {
+                    background-color: transparent;
+                    color: black;
+                    border: solid 4px #192f59;
                 }
-                return response.json();
-            })
-            .then(data => {
-                // Replace this with the actual handling of the user list
-                console.log('User list:', data);
-                alert('User list: ' + JSON.stringify(data));
-            })
-            .catch(error => {
-                console.error('There was a problem with the fetch operation:', error);
-                alert('Error: ' + error.message);
-            });
+                100% {
+                    border-color: white;
+                    color: white;
+                    background-color: #192f59;
+                }
+            }
+
+            @keyframes hover-back{
+                0% {
+                    border-color: white;
+                    color: white;
+                    background-color: #192f59;
+                }
+                100% {
+                    background-color: transparent;
+                    color: black;
+                    border: solid 4px #192f59;
+                }
+            }
+
+            #container{
+                min-width: 90vw;
+                min-height: 10vh;
+                background-color: white;
+                padding: 5px;
+                margin-top: 10px;
+            }
+
+            table{
+                width: -webkit-fill-available;
+            }
+
+            input[type='checkbox']{
+                display: none;
+            }
+
+            .form-check{
+                width: inherit;
+                height: inherit;
+            }
+            .form-check-label{
+                display: block;
+                border: #192f59 2px solid;
+                width: 40px;
+                height: 20px;
+                margin: auto;
+
+                animation: hover-back;
+                animation-duration: 0.5s;
+                animation-fill-mode: forwards;
+
+                border-radius:0px; /* Initial border */
+                transition: border-radius 0.5s; /* Add transition for smooth animation */
+
+                text-align: center;
+                color: #192f59;
+
+                background-image:url("./select-rectangle.png");
+                background-size:contain; /* Adjust image size to cover the button */
+                background-repeat: no-repeat;
+                background-position: center; /* Center the image */
+            }
+
+            .form-check-label:hover{
+                border-radius:15px; /* Initial border */
+                transition: border-radius 0.5s; /* Add transition for smooth animation */
+            }
+
+            .form-check-input:checked + .form-check-label{
+                animation: hover;
+                animation-duration: 0.5s;
+                animation-fill-mode: forwards;
+                border: 4px transparent solid;
+                color: #192f59!important;
+            }
+
+            tr{
+                text-align: center;
+                outline: 0.5px solid #192f59;
+            }
+
+            tr td button{
+                display: block;
+                margin: auto;
+
+                text-align: center;
+                color: #192f59;
+                background-color: red;
+                background-image:url("./trash-can.webp");
+                background-size:contain; /* Adjust image size to cover the button */
+                background-repeat: no-repeat;
+                background-position: center; /* Center the image */
+
+                width: 48px;
+                height: 28px;
+                border: 4px #192f59 solid;
+                padding: 0;
+
+                border-radius: 0px;
+                transition: all 0.5s;
+            }
+
+            tr td button:hover{
+                background-color: white;
+                border: 4px red solid;
+                border-radius:15px; /* Initial border */
+
+                transition: all 0.5s;
+            }
+
+            tr td button:active{
+                background-color: white;
+                border: 2px red solid;
+            }
+
+            tr:has(.form-check-input:checked) {
+                background-color: rgba(200, 0, 0, 0.3);
+                /* Add any other styles you want */
+            }
+
+            .add-user{
+                color: #192f59;
+                width: 40vw;
+                height: fit-content;
+                margin: auto;
+            }
+            .add-user div{
+                font-size: larger;
+                height: 40px;
+                color: #192f59;
+            }
+            .add-user input{
+                height: 20px;
+                width: 20vw;
+                float: right;
+
+                background-color: transparent;
+                color: black;
+                border: solid 4px #192f59;
+
+                animation: hover-back;
+                animation-duration: 0.5s;
+                animation-fill-mode: forwards;
+            }
+            .add-user input:focus{
+                outline: none;
+                animation: hover;
+                animation-duration: 0.5s;
+                animation-fill-mode: forwards;
+            }
+            .add-user button{
+                font: inherit;
+                width: 150px;
+                height: 45px;
+                float: right;
+
+                background-color: transparent;
+                color: black;
+                border: solid 4px #192f59;
+
+                animation: hover-back;
+                animation-duration: 0.5s;
+                animation-fill-mode: forwards;
+            }
+            .add-user button:hover{
+                animation: hover;
+                animation-duration: 0.5s;
+                animation-fill-mode: forwards;
+            }
+
+            button:focus{
+                outline: orangered 4px dotted;
+            }
+
+            .loading{
+                position: fixed;
+                top: 0;
+                width: 99vw;
+                height: 99vh;
+                margin: auto;
+                background-color: rgba(0,0,0, 0.5);
+            }
+
+            .loading div{
+                margin: 18.5vh auto;
+                width: 60vb;
+                height: 60vb;
+                background-color: #192f599a;
+
+                background-image:url("./loading-cogs.gif");
+                background-size:contain; /* Adjust image size to cover the button */
+                background-repeat: no-repeat;
+                background-position: center; /* Center the image */
+
+                border-radius: 5vb;
+
+                font-size: 2em;
+                color: white;
+                text-align: center;
+            }
+            .loading div span{
+                display: block;
+                padding-top: 15vb;
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <div class="riseLogo"></div>
+            <span class="options">
+                <button id="showUsers">Show User List</button>
+                <button id="addUser">Create New User</button>
+                <button id="deleteUsers">Batch Delete Users (0)</button>
+            </span>
+        </header>
+        <div id="container">
+        </div>
+        <div class="loading" hidden="true">
+            <div>
+                <span>
+                    Loading...
+                </span>
+            </div>
+        </div>
+    </body>
+    <script>
+        let logo = document.getElementsByClassName('riseLogo')[0];
+        logo.addEventListener("click", function(){
+            location.reload()
+        })
+
+        let container = document.getElementById("container");
+        let loadingDiv = document.getElementsByClassName("loading")[0]
+        let userListHTML = ""
+
+        function loading(state){
+            if(state == "start"){
+                loadingDiv.hidden = false;
+            }else{
+                loadingDiv.hidden = true;
+            }
         }
-        
-    function captureAndStoreTokens() {
-    const hashParams = new URLSearchParams(window.location.hash.slice(1));
-    const idToken = hashParams.get('id_token');
-    const accessToken = hashParams.get('access_token');
-    const tokenExpiry = hashParams.get('expires_in');
-    const tokenType = hashParams.get('token_type');
 
-    // Check if the tokens are present
-    //if (idToken && accessToken && tokenExpiry && tokenType) {
-    if (idToken) {
+        // Axios request interceptor to show loading indicator
+        axios.interceptors.request.use(config => {
+            loading("start")
+            return config;
+        });
 
-        // Store the tokens in local storage or perform other actions
-        localStorage.setItem('id_token', idToken);
-        localStorage.setItem('access_token', accessToken);
-        localStorage.setItem('expires_in', tokenExpiry);
-        localStorage.setItem('token_type', tokenType);
+        // Axios response interceptor to hide loading indicator
+        axios.interceptors.response.use(
+            response => {
+                loading("stop")
+                return response;
+            },
+            error => {
+                loading("stop")
+                return Promise.reject(error);
+            }
+        );
 
-        // Output the tokens for testing (remove this in production)
-        console.log('id_token:', idToken);
-        console.log('access_token:', accessToken);
-        console.log('expires_in:', tokenExpiry);
-        console.log('token_type:', tokenType);
-    } else {
-        // Tokens are missing
-        console.error('Tokens are missing from the URL fragment.');
-        alert('Tokens are missing. Authentication failed.');
-    }
-}
+        function captureAndStoreTokens() {
+            const hashParams = new URLSearchParams(window.location.hash.slice(1));
+            const idToken = hashParams.get('id_token');
+            const accessToken = hashParams.get('access_token');
+            const tokenExpiry = hashParams.get('expires_in');
+            const tokenType = hashParams.get('token_type');
 
+            // Check if the tokens are present
+            //if (idToken && accessToken && tokenExpiry && tokenType) {
+            if (idToken) {
+                // Store the tokens in local storage or perform other actions
+                localStorage.setItem('id_token', idToken);
+                localStorage.setItem('access_token', accessToken);
+                localStorage.setItem('expires_in', tokenExpiry);
+                localStorage.setItem('token_type', tokenType);
 
-        
+                // Output the tokens for testing (remove this in production)
+                console.log('id_token:', idToken);
+                console.log('access_token:', accessToken);
+                console.log('expires_in:', tokenExpiry);
+                console.log('token_type:', tokenType);
+            } else {
+                // Tokens are missing
+                alert('Authentication failed. You will be redirected to a login page.');
+                window.location.replace("https://riseask.s3.ap-southeast-1.amazonaws.com/admin/index.html");
+            }
+        }
+
+        // Function to handle listing all users
+        function listUsers() {
+            loading("start")
+            userListHTML = ""
+            container.innerHTML =
+            `
+                <table>
+                    <tr>
+                        <th>Select</th>
+                        <th>Name</th>
+                        <th>Phone</th>
+                        <th>Timestamp</th>
+                        <th>Delete</th>
+                    </tr>
+                </table>
+            `
+            const apiUrl = 'https://73qn0eq2cd.execute-api.ap-southeast-1.amazonaws.com/prod/admin';
+            const body = {
+                action: "list_users"
+            };
+
+            const config = {
+                method: 'post',
+                url: apiUrl,
+                headers: {
+                    'Authorization': "Bearer " + localStorage.getItem('id_token'),
+                    'Content-Type': 'application/json',
+                },
+                data: body
+            };
+
+            axios(config)
+                .then(response => {
+                    console.log('User list:', response.data.body);
+                    let users = JSON.parse(response.data.body).users;
+                    for(let i = 0; i < users.length; i++){
+                        let user = users[i];
+                        let table = document.getElementsByTagName("table")[0]
+                        table.innerHTML+=`
+                            <tr>
+                                <td>
+                                    <input class="form-check-input" type="checkbox" value="" id="defaultCheck${i}">
+                                    <label class="form-check-label" for="defaultCheck${i}"></label>
+                                </td>
+                                <td>${user.user_name}</td>
+                                <td>${user.user_mobile}</td>
+                                <td>${user.timestamp}</td>
+                                <td><button class="delete-user"></button></td>
+                            </tr>
+                        `
+                    }
+                    userListHTML = container.innerHTML;
+                    //attach event listeners to all delete buttons
+                    deleteUserSingleEvents();
+                })
+                .catch(error => {
+                    alert('Authentication failed. You will be redirected to a login page.');
+                    window.location.replace("https://riseask.s3.ap-southeast-1.amazonaws.com/admin/index.html");
+                });
+        }
+
         // Function to handle adding a new user
         function addUser() {
             // Replace this with the actual implementation to add a new user
-            alert("Adding a new user. Replace this with the actual implementation.");
+            if(userListHTML != "" && container.innerHTML.includes("<table>")){
+                console.log("running")
+                userListHTML = container.innerHTML;
+                container.innerHTML = `
+                    <div class="add-user">
+                        <h2>Create a new user below:</h2>
+                        <div>
+                            Full Name:
+                            <input/>
+                        </div>
+                        <div>
+                            Phone Number:
+                            <input/>
+                        </div>
+                        <button>Add User</button>
+                    </div>
+                `
+                console.log(document.getElementsByTagName("button")[0])
+                container.getElementsByTagName("button")[0].addEventListener("click", function(){
+                    console.log("yo")
+                    if(container.getElementsByTagName("input")[0].value!="" && container.getElementsByTagName("input")[1].value!=""){
+                        const apiUrl = 'https://73qn0eq2cd.execute-api.ap-southeast-1.amazonaws.com/prod/admin';
+                        const body = {
+                            action: "add_user",
+                            user_name: container.getElementsByTagName("input")[0].value,
+                            user_mobile: container.getElementsByTagName("input")[1].value
+                        };
+
+                        const config = {
+                            method: 'post',
+                            url: apiUrl,
+                            headers: {
+                                'Authorization': "Bearer " + localStorage.getItem('id_token'),
+                                'Content-Type': 'application/json',
+                            },
+                            data: body
+                        };
+
+                        axios(config)
+                            .then(response => {
+                                listUsers();
+                            })
+                            .catch(error => {
+                                console.log(error)
+                                alert('Network error! Unable to create user, please refresh page and try again. Contact support if problem persists.');
+                            });
+                    }
+                })
+            }
         }
-        
+
         // Function to handle deleting a user
-        function deleteUser() {
+        function deleteUser(mobile, refreshList=true) {
             // Replace this with the actual implementation to delete a user
-            alert("Deleting a user. Replace this with the actual implementation.");
+            const apiUrl = 'https://73qn0eq2cd.execute-api.ap-southeast-1.amazonaws.com/prod/admin';
+            const body = {
+                action: "remove_user",
+                user_mobile: mobile
+            };
+            console.log(mobile)
+            const config = {
+                method: 'post',
+                url: apiUrl,
+                headers: {
+                    'Authorization': "Bearer " + localStorage.getItem('id_token'),
+                    'Content-Type': 'application/json',
+                },
+                data: body
+            };
+
+            axios(config)
+                .then(response => {
+                    if(refreshList){
+                        listUsers();
+                    }
+                })
+                .catch(error => {
+                    console.log(error)
+                    alert('Network error! \nUnable to delete user, please refresh the page and try again. Contact support if problem persists.');
+                });
         }
-        
+
+        function deleteUserSingleEvents(){
+            delButtons = document.getElementsByClassName("delete-user");
+            for(button of delButtons){
+                button.addEventListener("click", function(){
+                    let tr = this.parentNode.parentNode
+                    tr.style.textDecoration = "line-through"
+                    deleteUser(tr.getElementsByTagName("td")[2].innerText)
+                })
+            }
+        }
         // Attach click event handlers to the buttons
         document.getElementById('addUser').addEventListener('click', addUser);
-        document.getElementById('deleteUser').addEventListener('click', deleteUser);
+        document.getElementById('deleteUsers').addEventListener('click', function(){
+            if(userListHTML != ""){
+                let selectedUsers = document.querySelectorAll('input[type="checkbox"]:checked');
+                if(selectedUsers.length>0){
+                    for(let user of selectedUsers){
+                        user.parentNode.parentNode.style.textDecoration = "line-through";
+                        if(user == selectedUsers[selectedUsers.length-1]){
+                            deleteUser(user.parentNode.parentNode.getElementsByTagName("td")[2].innerText)
+                        }else{
+                            deleteUser(user.parentNode.parentNode.getElementsByTagName("td")[2].innerText, false)
+                        }
+                    }
+                }else{
+                    alert("Please select users to batch delete.")
+                }
+            }
+        });
+        document.getElementById('showUsers').addEventListener('click', function(){
+            if(userListHTML!=""){
+                container.innerHTML = userListHTML
+                deleteUserSingleEvents();
+            }
+        });
+        document.addEventListener("click", function(){
+            try{
+                document.getElementById("deleteUsers").innerText = `Batch Delete Users (${document.querySelectorAll('input[type="checkbox"]:checked').length})`
+            }catch{
+                console.log("error")
+            }
+        })
         // Call the function to capture and store the tokens
-captureAndStoreTokens();
-
+        captureAndStoreTokens();
+        listUsers();
     </script>
-</body>
 </html>
