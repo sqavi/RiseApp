@@ -1,46 +1,229 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <title>OTP Verification</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <title>RiseApp Verify Registration</title>
+    <style>
+        html{
+            background-color: #192f59;
+            min-height: 90vh;
+        }
+        body{
+            min-height: inherit;
+            max-width: 90%;
+
+            background-color: #192f59;
+            margin: auto;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+
+            font-size: 1em;
+            font-family: Helvetica, sans-serif;
+        }
+        header{
+            background-color: white;
+            display: flex;
+            padding: 5px;
+            min-width: 100%;
+        }
+        .riseLogo{
+            margin-left: 5px;
+            height: fit-content;
+            width: fit-content;
+        }
+        .riseLogo img{
+            height: 70px;
+        }
+        .options{
+            margin: auto;
+        }
+        button{
+            font: inherit;
+            width: 200px;
+            height: 60px;
+
+            background-color: transparent;
+                color: black;
+                border: solid 4px #192f59;
+
+            animation: hover-back;
+            animation-duration: 0.5s;
+            animation-fill-mode: forwards;
+        }
+        button:hover{
+            animation: hover;
+            animation-duration: 0.5s;
+            animation-fill-mode: forwards;
+        }
+
+        @keyframes hover{
+            0% {
+                background-color: transparent;
+                color: black;
+                border: solid 4px #192f59;
+            }
+            100% {
+                border-color: white;
+                color: white;
+                background-color: #192f59;
+            }
+        }
+
+        @keyframes hover-back{
+            0% {
+                border-color: white;
+                color: white;
+                background-color: #192f59;
+            }
+            100% {
+                background-color: transparent;
+                color: black;
+                border: solid 4px #192f59;
+            }
+        }
+
+        #container{
+            min-width: 10vw;
+            min-height: 10vh;
+            background-color: white;
+            padding: 3vb;
+            margin: auto;
+        }
+
+        h2 {
+            margin: auto;
+            text-align: center;
+        }
+
+        .form-check {
+            margin-top: 10px;
+            border: #192f59 solid 4px;
+            padding: 0;
+
+            animation: hover-back;
+            animation-duration: 0.5s;
+            animation-fill-mode: forwards;
+        }
+
+        .form-check:hover{
+            animation: hover;
+            animation-duration: 0.5s;
+            animation-fill-mode: forwards;
+            outline: #ff7518 solid 2px;
+        }
+
+        .form-check-label{
+            padding: 10px;
+            text-align: center;
+            width: -webkit-fill-available;
+        }
+
+        .form-check-input{
+            display: none;
+        }
+
+        /* Set background color when checked */
+        .form-check-input:checked + .form-check-label {
+            background-color: #192f59; /* Change to your desired background color */
+            color: white; /* Change text color for better contrast */
+            outline: #ff7518 solid 2px;
+        }
+
+        #verificationForm{
+            margin: auto;
+            width: fit-content;
+            font-size: 2.3em;
+        }
+        #verificationForm button{
+            display: block;
+            float: right;
+        }
+        #verificationForm input{
+            float: right;
+        }
+        #verificationForm label{
+            padding-right: 20px; 
+        }
+        header h1{
+            margin-left: -150px;
+        }
+
+        #verificationForm input{
+            width: 40vw;
+        }
+    </style>
 </head>
 <body>
-    <h1>OTP Verification</h1>
-
+    <header>
+        <a class="riseLogo"><img src="./Rise-Logo.png" alt="Rise Premier text logo"></a>
+        <span class="options">
+            <h1>Verify OTP</h1>
+        </span>
+    </header>
+    <div id="container">
+        <form id="verificationForm">
+            <label for="user_name">OTP:</label>
+            <input type="text" id="otp" name="otp" required><br><br>
+             
+            <button type="submit">Verify OTP</button>
+        </form>
+    </div>   
     <script>
-       // Get user_mobile and otp from local storage
-const user_mobile = localStorage.getItem('user_mobile');
-const otp = localStorage.getItem('otp');
-console.log('OTP:', otp, 'user_mobile:', user_mobile);
-// Prepare the request body
-const requestBody = {
-    user_mobile: user_mobile,
-    otp: otp
-};
+        const verificationForm = document.getElementById('verificationForm');
+        
+        verificationForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            const otp = document.getElementById('otp').value;
+            //const user_email = document.getElementById('user_email').value;
+           //verify otp is valid format
+            const otpPattern = /^[0-9]{5}$/;
+            if (!otpPattern.test(otp)) {
+                alert('Invalid OTP. Enter correct OTP.');
+                return;
+            }
+            
+            //Get the  user_mobile from local storage
+            const user_mobile = localStorage.getItem('user_mobile');
 
-// Send verification request to API
-fetch('https://zkel9v1575.execute-api.ap-southeast-1.amazonaws.com/prod/verify', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(requestBody)
-})
-.then(response => response.json())
-.then(data => {
-    const responseBody = JSON.parse(data.body); // Parse the JSON within the response body
-    const auth_token = responseBody.auth_token; // Get the OTP value from the parsed response body
-    //const auth_token = data.auth_token; // Assuming auth_token is in the response JSON
-
-    // Save auth_token in local storage
-    localStorage.setItem('auth_token', auth_token);
-
-    // Redirect to the askgpt page
-    window.location.href = 'askgpt.html';
-})
-.catch(error => {
-    console.error('Verification Error:', error);
-    // Handle error here
-});
-</script>
+            // Send registration request to your API endpoint
+            fetch('https://zkel9v1575.execute-api.ap-southeast-1.amazonaws.com/prod/verify', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    otp: otp,
+                    user_mobile: user_mobile,
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                const responseBody = JSON.parse(data.body); // Parse the JSON within the response body
+                const otp = responseBody.otp; // Get the OTP value from the parsed response body
+    
+                // Save OTP in local storage
+                localStorage.setItem('otp', otp);
+                
+                // Redirect to the OTP verification page
+                //window.location.href = `otp_verification.html?user_mobile=${user_mobile}&otp=${otp}`;
+                
+               window.location.href = 'askgpt.html';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Registration failed. Please try again.');
+            });
+        });
+    
+    </script>
 </body>
 </html>
