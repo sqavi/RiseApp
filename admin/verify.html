@@ -208,15 +208,18 @@
             .then(response => response.json())
             .then(data => {
                 const responseBody = JSON.parse(data.body); // Parse the JSON within the response body
-                const otp = responseBody.otp; // Get the OTP value from the parsed response body
-    
-                // Save OTP in local storage
-                localStorage.setItem('otp', otp);
+                const auth_token = responseBody.auth_token; // Get the OTP value from the parsed response body
+                if (auth_token && auth_token !== '0') {
+                // Save auth_token in local storage
+                    localStorage.setItem('auth_token', auth_token);
+                // Redirect to the askgpt verification page
+                window.location.href = 'askgpt.html';
+                } else {
+                // Handle the case where otp is empty or zero
+                console.log('Registratoin faild, try again');  
+                window.location.href = 'verify.html';
+            }
                 
-                // Redirect to the OTP verification page
-                //window.location.href = `otp_verification.html?user_mobile=${user_mobile}&otp=${otp}`;
-                
-               window.location.href = 'askgpt.html';
             })
             .catch(error => {
                 console.error('Error:', error);

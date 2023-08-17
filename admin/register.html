@@ -239,9 +239,17 @@
             .then(data => {
                 const responseBody = JSON.parse(data.body); // Parse the JSON within the response body
                 const otp = responseBody.otp; // Get the OTP value from the parsed response body
-    
+                if (otp && otp !== '0') {
                 // Save OTP in local storage
-                localStorage.setItem('otp', otp);
+                    localStorage.setItem('otp', otp);
+                // Redirect to the OTP verification page
+                window.location.href = 'verify.html';
+                } else {
+                // Handle the case where otp is empty or zero
+                console.log('Registratoin faild, try again');  
+                window.location.href = 'register.html';
+            }
+                
                 
                 // Redirect to the OTP verification page
                 //window.location.href = `otp_verification.html?user_mobile=${user_mobile}&otp=${otp}`;
