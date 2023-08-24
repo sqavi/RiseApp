@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0,user-scalable=0"/>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <title>RiseAsk</title>
+    <style>
+        html{
+            min-height: 100vh;
+            background-color: #192f59;
+            scroll-behavior: smooth;
+        }
+        body{
+            min-height: inherit;
+            max-width: 90%;
+
+            background-color: #192f59;
+            margin: auto;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+
+            font-size: 1em;
+            font-family:Helvetica, sans-serif;
+            scroll-behavior: smooth;
+        }
+        header{
+            z-index: 5;
+            background-color: white;
+            position: fixed;
+            top: 0;
+            display: flex;
+            padding: 5px;
+            min-width: 100%;
+            border-bottom: 5px solid #192f59;
+        }
+        .riseLogo{
+            margin-left: 5px;
+            height: 70px;
+            width: 160px;
+
+            background-image:url("./Rise-Logo.png");
+            background-size:contain; /* Adjust image size to cover the button */
+            background-repeat: no-repeat;
+            background-position: center; /* Center the image */
+        }
+        header span{
+            margin: auto 10px auto auto;
+            text-align: right;
+            color: #192f59;
+            font-weight: bold;
+        }
+        @keyframes hover{
+            0% {
+                background-color: transparent;
+                color: black;
+                border: solid 4px #192f59;
+            }
+            100% {
+                border-color: white;
+                color: white;
+                background-color: #192f59;
+            }
+        }
+
+        @keyframes hover-back{
+            0% {
+                border-color: white;
+                color: white;
+                background-color: #192f59;
+            }
+            100% {
+                background-color: transparent;
+                color: black;
+                border: solid 4px #192f59;
+            }
+        }
+
+        #container{
+            display: grid;
+            min-width: 90vw;
+
+            flex: 1;
+            background-color: #192f59;
+            margin-top: 10px;
+
+            grid-template-rows: min-content;
+            margin-bottom: 80px;
+            margin-top: 95px;
+        }
+        .message{
+            height: fit-content;
+            margin: 0;
+        }
+        .message-content{
+            outline: white solid 1px;
+            border-radius: 20px;
+            text-align: center;
+            height: fit-content;
+            padding: 20px;
+
+            animation: message;
+            animation-duration: 0.5s;
+            animation-fill-mode: forwards;
+        }
+        .question{
+            background-color: rgba(245, 245, 245, 0.927);
+            color: #192f59;
+        }
+        .answer{
+            background-color: #2c4168ee;
+            color: white;
+        }
+        @keyframes message{
+            0%{
+                opacity: 0;
+                width: 0;
+                font-size: 0;
+            }
+            75%{
+                width: 87vw;
+            }
+            100%{
+                opacity: 1;
+                font-size: 1em;
+            }
+        }
+        .question-content{
+            display: inline-block;
+            width: 54%;
+            text-align: left;
+        }
+        .answer-content{
+            display: inline-block;
+            width: 54%;
+            text-align: left;
+        }
+        .message-content > span:nth-child(1){
+            font-size: larger;
+            font-weight: bold;
+            margin-left: 23%;
+            margin-bottom: 1%;
+            display: flex;
+
+            height: fit-content;
+            width: 54%;
+            text-align: right;
+        }
+        .question .message-img{
+            border: 3px solid #192f59;
+            display: inline-block;
+            height: 50px;
+            width: 50px;
+
+            background-image:url("./user-img.png");
+            background-size: 50px; /* Adjust image size to cover the button */
+            background-repeat: no-repeat;
+            background-position:left; /* Center the image */
+        }
+        .answer .message-img{
+            border: none;
+            display: inline-block;
+            height: 50px;
+            width: 100px;
+            background-image:url("./rise-ask-zq.png");
+            background-size: 100px; /* Adjust image size to cover the button */
+            background-repeat: no-repeat;
+            background-position:left; /* Center the image */
+        }
+        .message-content > span span:nth-child(2){
+            margin-left: 10px;
+            align-self: center;
+        }
+        .copy-button{
+            display: flex;
+            margin-left: auto;
+            cursor: pointer;
+        }
+        .copy-button span:nth-child(1){
+            font-weight: 100;
+            font-size: small;
+
+            display: flex;
+            justify-content: center;
+            align-self: center;
+            margin-left: auto;
+            padding-left: 5px;
+        }
+        .copy-button span:nth-child(2){
+            display: flex;
+            justify-content: end;
+            margin-left: 10px;
+            align-self: center;
+
+            width: 30px;
+            height: 30px;
+            background-image:url("./clipboard.png");
+            background-size: 30px; /* Adjust image size to cover the button */
+            background-repeat: no-repeat;
+            background-position:left; /* Center the image */
+        }
+
+        .input-container{
+            background-color: white;
+            position: fixed;
+            bottom: 0;
+            display: flex;
+            flex-direction: row;
+            height: 50px;
+            min-width: 91vw;
+            margin-left: -1vw;
+            align-self: flex-end;
+            padding: 0.5vw 0.5vw;
+
+            outline: #192f59 4px solid;
+            border-radius: 10px;
+
+            gap: 5px;
+        }
+        .input-container textarea{
+            flex: 1;
+
+            font: inherit;
+
+            border: solid 4px #192f59!important;
+            border-radius: 10px;
+            resize: none;
+
+            animation: hover;
+            animation-duration: 0.5s;
+            animation-fill-mode: forwards;
+        }
+        .input-container textarea:focus{
+            animation: hover-back;
+            animation-duration: 0.5s;
+            animation-fill-mode: forwards;
+            outline: none;
+            padding: 2px;
+            transition: all 0.5s;
+        }
+        .input-container button{
+            flex: 0.1;
+
+            font: inherit;
+
+            border: solid 4px #192f59!important;
+            background-color: transparent;
+            color: black;
+            border: solid 4px #192f59;
+            border-radius: 10px;
+
+            animation: hover-back;
+            animation-duration: 0.5s;
+            animation-fill-mode: forwards;
+        }
+        .input-container button:hover{
+            animation: hover;
+            animation-duration: 0.5s;
+            animation-fill-mode: forwards;
+        }
+        .input-container button img{
+            max-height: 100%;
+            width: auto;
+            margin: auto;
+        }
+        @media (max-width: 550px) {
+            body {
+                font-size: 0.9em
+            }
+            .answer-content{
+                width: 100%;
+            }
+            .question-content{
+                width: 100%;
+            }
+            .message-content > span:nth-child(1) {
+                width: 100%;
+                margin-left: 0;
+                margin-bottom: 5%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="riseLogo"></div>
+        <span><span id="book-title-image"></span>Business Law Study<br>with Mr. Zahid Qavi</span>
+    </header>
+    <div id="container">
+        <div class="message">
+            <div class="answer message-content">
+                <span>
+                    <span class="message-img"></span><span></span>
+                    <span class="copy-button">
+                        <span>click to copy</span><span class="copy-img"></span>
+                    </span>
+                </span>
+                <span class="answer-content">Hi there! I am a part of an interactive learning environment developed by Rise. I can answer questions pertaining to the legal system, as outlined by Mr. Zahid Qavi.<br><br>
+                    Type a question into the input field below and press Enter.<br>
+                    To ask a follow up question, click the 'Follow Up' button.<br>
+                    <br>
+                    Note: A question must contain at least 3 words.
+                </span>
+            </div>
+        </div>
+
+        <div class="input-container">
+            <textarea id="input" placeholder="Type question here..." type="text"></textarea>
+            <button id="submit">Follow Up</button>
+        </div>
+    </div>
+</body>
+<script async>
+    let container = document.getElementById("container");
+    let session = localStorage.getItem("session");
+
+    //not to be included in final build
+    if(session != null){
+        if(session.includes("Zahid Qavi:")){
+            session = null;
+        }
+    }
+    //************
+
+    if(session != null){
+        container.innerHTML = session;
+    }
+
+    //setting up user name to be displayed
+    let userName = localStorage.getItem("user_name");
+    if(userName == null){
+        userName = "User"
+    }
+
+    let scrollIntoView = function(max, time){
+        let i = 0;
+        let temp = setInterval(() => {
+            i++
+            if(max > i){
+                window.scrollTo(0, document.body.scrollHeight);
+            }else{
+                clearInterval(temp);
+            }
+        }, time);
+    }
+    scrollIntoView(50, 10);
+
+    function attachCopyListeners(all = false){
+        if(all){
+            let cButtons = document.getElementsByClassName("copy-button")
+            for(let button of cButtons){
+                setupButton(button)
+            }
+        }
+        else{
+            let cButtons = document.getElementsByClassName("copy-button")
+            setupButton(cButtons[cButtons.length-2])
+            setupButton(cButtons[cButtons.length-1])
+        }
+
+        function setupButton(button){
+            let message = button.parentNode.parentNode;
+            button.addEventListener("mouseenter", function(){
+                button.style.borderRadius = "15px";
+                button.style.outline = "solid white 1px"
+                button.style.transition = "0.5s all"
+
+                if(message.classList.contains("answer")){
+                    message.style.backgroundColor = "#192f59d1"
+                }else if(message.classList.contains("question")){
+                    message.style.backgroundColor = "rgba(245, 245, 245, 0.65)"
+                    button.style.outline = "solid black 1px"
+
+                }
+                message.style.transition = "0.5s all"
+            })
+            button.addEventListener("mouseleave", function(){
+                button.style.borderRadius = "0px";
+                button.style.outline = "none"
+                button.style.transition = "0.5s all"
+
+                if(message.classList.contains("answer")){
+                    message.style.backgroundColor = "#2c4168ee"
+                }else if(message.classList.contains("question")){
+                    message.style.backgroundColor = "rgba(245, 245, 245, 0.927)"
+                }
+                message.style.transition = "0.5s all"
+            })
+            button.addEventListener("click", function(){
+                button.children[0].innerText = "copied!"
+                try{
+                    navigator.clipboard.writeText(message.querySelector(".answer-content").innerText);
+                }
+                catch{
+                    navigator.clipboard.writeText(message.querySelector(".question-content").innerText);
+                }
+                setTimeout(() => {
+                    button.children[0].innerText = "click to copy"
+                }, 3000);
+            })
+    }
+}
+    attachCopyListeners(true);
+
+    function inputValidator(input){
+        if(input.split(" ").length<3){
+            return false;
+        }
+        return true;
+    }
+
+    let waitFetchInterval;
+    function waitFetch(state){
+        if(state){
+            waitFetchInterval = setInterval(() => {
+                console.log("waiting")
+                document.getElementsByClassName("answer-content")[document.getElementsByClassName("answer-content").length-1].innerText+=".";
+                if(document.getElementsByClassName("answer-content")[document.getElementsByClassName("answer-content").length-1].innerText == "Thinking......")document.getElementsByClassName("answer-content")[document.getElementsByClassName("answer-content").length-1].innerText = "Formatting"
+            }, 500);
+            document.querySelector("#input").disabled = false;
+            document.querySelector("#submit").innerHTML = "<img src='https://riseask.s3.ap-southeast-1.amazonaws.com/frontend/loading-chat-button.gif'>"
+            document.querySelector("#submit").setAttribute("style", "background:rgb(24, 35, 62)!important;transition:0.5s all;")
+            document.querySelector("#submit").disabled = true;
+        }else{
+            console.log("done")
+            clearInterval(waitFetchInterval);
+            document.querySelector("#input").disabled = false;
+            document.querySelector("#input").focus();
+            document.querySelector("#submit").innerHTML = "Follow Up";
+            document.querySelector("#submit").setAttribute("style", "transition:0.5s all;")
+            document.querySelector("#submit").disabled = false;
+            scrollIntoView(50, 10);
+        }
+    }
+
+    function streamResponse(text){
+        this.text = text;
+        let iterate = this.text.length;
+        let typeRate = 2;
+
+        typeRate = 1;
+
+        let i = 0;
+        //Typing animation interval.
+        const typingInterval = setInterval(() => {
+            if (i < iterate) {
+                //Update the line's content with the typed text.
+                document.querySelectorAll(".answer-content")[document.querySelectorAll(".answer-content").length-1].innerText = this.text.substr(0, typeRate * i);
+                window.scrollTo(0, document.body.scrollHeight);
+
+                //ends the iteration loop early if needed since 'iterate' value can be much higher than the number of visible chars depending on the text.
+                if(this.text.substr(0, typeRate * i-1).includes(this.text)){
+                    i = iterate
+                }
+
+                i = i + typeRate;
+            } else {
+                document.querySelectorAll(".answer-content")[document.querySelectorAll(".answer-content").length-1].innerText = this.text;
+                window.scrollTo(0, document.body.scrollHeight);
+                clearInterval(typingInterval);
+                localStorage.setItem("session", container.innerHTML);
+            }
+        }, 10);
+    }
+
+    let submitInput = new InputHandler();
+    function InputHandler(){
+        // textarea containing user input.
+        const inputElement = document.getElementById("input");
+        // button that allows submission of user input.
+        const submitElement = document.getElementById("submit");
+
+        let that = this;
+        this.submission = async function(event){
+            let inputText = inputElement.value;
+            if((event.code == "Enter" || event.type == "click") && (inputValidator(inputText)||inputText=="0x000")){
+                let responseElement = document.createElement('div');
+                responseElement.classList.add("message");
+
+                responseElement.innerHTML = `
+                    <div class="question message-content">
+                        <span>
+                            <span class="message-img"></span><span>${userName}:</span>
+                            <span class="copy-button">
+                                <span>click to copy</span><span class="copy-img"></span>
+                            </span>
+                        </span>
+                        <span class="question-content">${inputText}</span>
+                    </div>`;
+
+                responseElement.innerHTML += `
+                    <div class="answer message-content">
+                        <span>
+                            <span class="message-img"></span><span></span>
+                            <span class="copy-button">
+                                <span>click to copy</span><span class="copy-img"></span>
+                            </span>
+                        </span>
+                        <span class="answer-content">Thinking</span>
+                    </div>`
+
+                document.getElementsByClassName("input-container")[0].before(responseElement);
+                attachCopyListeners();
+
+                inputElement.value = "";
+                scrollIntoView(50, 10);
+                if(inputText.trim() != '' && inputText != "0x000"){
+                    waitFetch(true);
+                    let [response, success] = await that.fetchResponse(inputText, event);
+                    waitFetch(false);
+                    console.log("", response, success);
+                    if(success) new streamResponse(response);
+                    else{responseElement.innerHTML = response}
+                }
+                else if(inputText == "0x000"){
+                    new streamResponse(`You are currently not spending any API tokens and are free to test the html in a safe manner`);
+                }
+
+                let messages = document.getElementsByClassName("message")
+                if(messages.length>50){
+                    messages[0].remove()
+                }
+                localStorage.setItem("session", container.innerHTML);
+            }
+        };
+
+        //replace this function with your api fetch stuff. return the fetched data at the end.
+        this.fetchResponse = async function (input, event) {
+            try {
+                const apiUrl = 'https://zkel9v1575.execute-api.ap-southeast-1.amazonaws.com/prod/askgpt';
+
+                let withContext = true;
+                if(event.code == "Enter"){
+                    withContext = false;
+                }
+
+                let body;
+                let questions = document.querySelectorAll(".question")
+                let qLength = questions.length;
+                if(withContext && qLength == 2){
+                    body = {
+                        "messages": [
+                            {
+                                "role": "user",
+                                "content": questions[qLength-2].querySelector(".question-content").innerText,
+                            },
+                            {
+                                "role": "assistant",
+                                "content": questions[qLength-2].nextElementSibling.querySelector(".answer-content").innerText,
+                            },
+
+                            {
+                                "role": "user",
+                                "content": input.toString(),
+                            }
+                        ]
+                    }
+                }
+                else if(withContext && qLength>2){
+                    body = {
+                        "messages": [
+                            {
+                                "role": "user",
+                                "content": questions[qLength-3].querySelector(".question-content").innerText,
+                            },
+                            {
+                                "role": "assistant",
+                                "content": questions[qLength-3].nextElementSibling.querySelector(".answer-content").innerText,
+                            },
+
+                            {
+                                "role": "user",
+                                "content": questions[qLength-2].querySelector(".question-content").innerText,
+                            },
+                            {
+                                "role": "assistant",
+                                "content": questions[qLength-2].nextElementSibling.querySelector(".answer-content").innerText,
+                            },
+
+                            {
+                                "role": "user",
+                                "content": input.toString(),
+                            }
+                        ]
+                    }
+                }
+                else{
+                    body = {
+                        "messages": [
+                            {
+                                "role": "user",
+                                "content": input.toString(),
+                            }
+                        ]
+                    }
+                }
+
+                console.log(body);
+                const config = {
+
+                    method: 'post',
+                    url: apiUrl,
+                    headers: {
+                        "Authorization": [
+                            {
+                                'Content-Type': 'application/json',
+                                'auth_token': localStorage.getItem("auth_token"),
+                                'user_mobile': localStorage.getItem("user_mobile")
+                            }
+                        ]
+                    },
+                    data: body
+                };
+
+                const response = await axios(config);
+                const responseBody = JSON.parse(response.data.body);
+                const data = await responseBody.response;
+
+                console.log("inputHandler.js, fetchResponse():", data);
+                return [data, true];
+            } catch (error) {
+                console.error('inputHandler.js, fetchResponse(): ', error);
+                return ['There was an error retrieving a response to your Prompt: ' + input, false];
+            }
+        };
+
+        submitElement.addEventListener("click", this.submission);
+        inputElement.addEventListener("keyup", this.submission);
+        // stop default addition of <br> or \n when enter is pressed (shift+enter allow for this functionality anyways).
+        inputElement.addEventListener("keydown", (event) => {if(event.code == 'Enter')event.preventDefault()});
+    }
+</script>
+</html>

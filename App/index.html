@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <title>AskZahid</title>
+    <style>
+        html{
+            background-color: #192f59;
+            min-height: 90vh;
+        }
+        body{
+            min-height: inherit;
+            max-width: 90%;
+
+            background-color: #192f59;
+            margin: auto;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+
+            font-size: 1em;
+            font-family: Helvetica, sans-serif;
+        }
+        header{
+            background-color: white;
+            display: flex;
+            padding: 5px;
+            min-width: 100%;
+        }
+        .riseLogo{
+            margin-left: 5px;
+            height: fit-content;
+            width: fit-content;
+        }
+        .riseLogo img{
+            height: 70px;
+        }
+        .options{
+            margin: auto;
+        }
+        button{
+            font: inherit;
+            width: 200px;
+            height: 60px;
+
+            background-color: transparent;
+                color: black;
+                border: solid 4px #192f59;
+
+            animation: hover-back;
+            animation-duration: 0.5s;
+            animation-fill-mode: forwards;
+        }
+        button:hover{
+            animation: hover;
+            animation-duration: 0.5s;
+            animation-fill-mode: forwards;
+        }
+
+        @keyframes hover{
+            0% {
+                background-color: transparent;
+                color: black;
+                border: solid 4px #192f59;
+            }
+            100% {
+                border-color: white;
+                color: white;
+                background-color: #192f59;
+            }
+        }
+
+        @keyframes hover-back{
+            0% {
+                border-color: white;
+                color: white;
+                background-color: #192f59;
+            }
+            100% {
+                background-color: transparent;
+                color: black;
+                border: solid 4px #192f59;
+            }
+        }
+
+        #container{
+            min-width: 10vw;
+            min-height: 10vh;
+            background-color: white;
+            padding: 3vb;
+            margin: auto;
+        }
+
+        h2 {
+            margin: auto;
+            text-align: center;
+        }
+
+        .form-check {
+            margin-top: 10px;
+            border: #192f59 solid 4px;
+            padding: 0;
+
+            animation: hover-back;
+            animation-duration: 0.5s;
+            animation-fill-mode: forwards;
+        }
+
+        .form-check:hover{
+            animation: hover;
+            animation-duration: 0.5s;
+            animation-fill-mode: forwards;
+            outline: #ff7518 solid 2px;
+        }
+
+        .form-check-label{
+            padding: 10px;
+            text-align: center;
+            width: -webkit-fill-available;
+        }
+
+        .form-check-input{
+            display: none;
+        }
+
+        /* Set background color when checked */
+        .form-check-input:checked + .form-check-label {
+            background-color: #192f59; /* Change to your desired background color */
+            color: white; /* Change text color for better contrast */
+            outline: #ff7518 solid 2px;
+        }
+
+        #verificationForm{
+            margin: auto;
+            width: fit-content;
+            font-size: 2.3em;
+        }
+        #verificationForm button{
+            display: block;
+            float: right;
+        }
+        #verificationForm input{
+            float: right;
+        }
+        #verificationForm label{
+            padding-right: 20px; 
+        }
+        header h1{
+            margin-left: -150px;
+        }
+
+        #verificationForm input{
+            width: 40vw;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a class="riseLogo"><img src="./Rise-Logo.png" alt="Rise Premier text logo"></a>
+        <span class="options">
+            <h1>Authenticating</h1>
+        </span>
+    </header>
+
+    <script>
+            
+            //Get the  user_mobile, auth_token & auth_token_expiry from local storage
+            const user_mobile = localStorage.getItem('user_mobile');
+            const auth_token = localStorage.getItem('auth_token');
+            //const user_mobile = localStorage.getItem('user_mobile');
+
+                if (auth_token && auth_token !== '0') {
+                // Save auth_token in local storage
+                //   localStorage.setItem('auth_token', auth_token);
+                // Redirect to the askgpt verification page
+                window.location.href = 'askgpt.html';
+                } else {
+                // Handle the case where otp is empty or zero
+                console.log('User Auth not found / Expired');  
+                window.location.href = 'register.html';
+            }
+                
+            
+     //       .catch(error => {
+      //          console.error('Error:', error);
+       //         alert('Registration failed. Please try again.');
+        //    });
+        //});
+    
+    </script>
+</body>
+</html>
